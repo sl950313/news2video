@@ -36,6 +36,7 @@ class News2Video():
         #sys.exit(1)
         self.imgroot = r'E:\testimg\/' + self.name + "/"
         self.videoroot = r'E:\testavi\/' + self.name + "/"
+        self.audioduration = 0
         if not os.path.exists(self.imgroot):
             os.makedirs(self.imgroot)
         if not os.path.exists(self.videoroot):
@@ -45,26 +46,23 @@ class News2Video():
     def getTextAndPicFromUrl(self):
         text = []
         pics = []
-        text.append("3月5日，在韩国大邱世界杯体育场，新冠肺炎轻症患者走下救护车，之后将被送往分散在庆尚北道各地的治疗中心。 当日，在韩国大邱，一批新冠肺炎轻症患者被集中到世界杯体育场，随后分批从这里出发，被分散送往庆尚北道各地的治疗中心。在治疗中心有专职医疗人员常驻，随时检查设施内确诊人员的身体状况，医疗人员认为需要住院的患者将被迅速移送到医院。 新华社发（李相浩 摄）")
-        text.append("3月5日，在韩国大邱世界杯体育场，医疗队工作人员坐在地上休息。 当日，在韩国大邱，一批新冠肺炎轻症患者被集中到世界杯体育场，随后分批从这里出发，被分散送往庆尚北道各地的治疗中心。在治疗中心有专职医疗人员常驻，随时检查设施内确诊人员的身体状况，医疗人员认为需要住院的患者将被迅速移送到医院。 新华社发（李相浩 摄）")
-        text.append("这是3月5日在韩国庆尚北道漆谷郡拍摄的一处专门供大邱的新冠肺炎轻症患者居住的治疗中心。 当日，在韩国大邱，一批新冠肺炎轻症患者被集中到世界杯体育场，随后分批从这里出发，被分散送往庆尚北道各地的治疗中心。在治疗中心有专职医疗人员常驻，随时检查设施内确诊人员的身体状况，医疗人员认为需要住院的患者将被迅速移送到医院。 新华社发（李相浩 摄）")
-        text.append("3月5日，在韩国庆尚北道漆谷郡，工作人员在一处专门供大邱新冠肺炎轻症患者居住的治疗中心进行消毒防疫。 当日，在韩国大邱，一批新冠肺炎轻症患者被集中到世界杯体育场，随后分批从这里出发，被分散送往庆尚北道各地的治疗中心。在治疗中心有专职医疗人员常驻，随时检查设施内确诊人员的身体状况，医疗人员认为需要住院的患者将被迅速移送到医院。 新华社发（李相浩 摄）")
-        pics.append(self.imgroot + "1.jpg")
-        pics.append(self.imgroot + "2.jpg")
-        pics.append(self.imgroot + "3.jpg")
-        pics.append(self.imgroot + "4.jpg")
-        pics.append(self.imgroot + "5.jpg")
-        pics.append(self.imgroot + "6.jpg")
-        pics.append(self.imgroot + "7.jpg")
-        pics.append(self.imgroot + "8.jpg")
-        pics.append(self.imgroot + "9.jpg")
-        pics.append(self.imgroot + "10.jpg")
+        '''
+        text.append(u"3月5日在韩国大邱世界杯体育场新冠肺炎轻症患者走下救护车之后将被送往分散在庆尚北道各地的治疗中心  当日在韩国大邱一批新冠肺炎轻症患者被集中到世界杯体育场 随后分批从这里出发 被分散送往庆尚北道各地的治疗中心 在治疗中心有专职医疗人员常驻 随时检查设施内确诊人员的身体状况 医疗人员认为需要住院的患者将被迅速移送到医院 新华社发（李相浩 摄）")
+        text.append(u"3月5日在韩国大邱世界杯体育场 医疗队工作人员坐在地上休息 当日，在韩国大邱，一批新冠肺炎轻症患者被集中到世界杯体育场，随后分批从这里出发，被分散送往庆尚北道各地的治疗中心。在治疗中心有专职医疗人员常驻，随时检查设施内确诊人员的身体状况，医疗人员认为需要住院的患者将被迅速移送到医院 新华社发（李相浩 摄）")
+        text.append(u"这是3月5日在韩国庆尚北道漆谷郡拍摄的一处专门供大邱的新冠肺炎轻症患者居住的治疗中心 当日在韩国大邱 一批新冠肺炎轻症患者被集中到世界杯体育场，随后分批从这里出发，被分散送往庆尚北道各地的治疗中心。在治疗中心有专职医疗人员常驻，随时检查设施内确诊人员的身体状况，医疗人员认为需要住院的患者将被迅速移送到医院 新华社发（李相浩 摄）")
+        text.append(u"3月5日在韩国庆尚北道漆谷郡工作人员在一处专门供大邱新冠肺炎轻症患者居住的治疗中心进行消毒防疫 当日在韩国大邱一批新冠肺炎轻症患者被集中到世界杯体育场  随后分批从这里出发  被分散送往庆尚北道各地的治疗中心。在治疗中心有专职医疗人员常驻，随时检查设施内确诊人员的身体状况医疗人员认为需要住院的患者将被迅速移送到医院华社发（李相浩 摄）")
+        '''
+        title = u"纽约股市12日早盘暴跌再度触发熔断机制"
+        text.append(u"3月12日，在美国纽约证券交易所，电子屏显示交易因触发熔断机制暂停。 纽约股市三大股指在12日开盘出现暴跌，跌幅超过7%。暴跌行情导致美股再次触发熔断机制，暂停交易15分钟。 新华社发")
+        files = os.listdir(self.imgroot)
+        for file in files:
+            pics.append(file)
         texts = text[0]
         for t in range(1, len(text)):
             texts += text[t]
             print(text[t])
         print(texts[0:30])
-        return texts, self.imgroot
+        return texts, self.imgroot, title
 
     def changePicSize(self, imgpath, width, height):
         print("imgPath:%s" % imgpath)
@@ -119,19 +117,19 @@ class News2Video():
             for j in range(0, perSecondImg):
                 videowriter.write(img)
 
-        left = duration - perSecondImg * imgnum
+        left = int(duration - perSecondImg * imgnum)
         print("pers img:%d duration:%d imgnum:%d left:%d" % (perSecondImg, duration, imgnum, left))
         if left > 0:
             for i in range(0, left):
                 img = cv2.imread(imgpath + '/' + os.listdir(imgpath)[-1])
-                videowriter.write()
+                videowriter.write(img)
 
         videowriter.release()
         print(videopath[:-3] + "mp4")
         self.convertAvi2Mp4(videopath, videopath[:-3] + "mp4")
         return videopath[:-3] + "mp4"
 
-    def addText2Video(self, videopath, texts):
+    def addText2Video(self, videopath, texts, title):
         textVideo = videopath[:-4] + "-withtext.mp4"
         print("addText2Video", videopath, "textVideo", textVideo)
         video = cv2.VideoCapture(videopath)
@@ -141,29 +139,40 @@ class News2Video():
         frame_height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
         videoWriter = cv2.VideoWriter(textVideo, fourcc, fps_video, (frame_width, frame_height))
         frame_id = 0
-        perLineWord = 10
+        perLineWord = 20
         lines = int(len(texts) / perLineWord)
+        perLineSecond = int(self.audioduration / lines)
+        print("lines:%d perlineword:%d textsLen:%d perlineSecond:%d" % (lines, perLineWord, len(texts), perLineSecond))
+        cnt = 0
 
         while (video.isOpened()):
             ret, frame = video.read()
             if ret == True:
-                textbegin = frame_id * perLineWord
-                textend = min((frame_id + 1) * perLineWord, len(texts))
-                showtext = texts[textbegin:textend].decode('utf-8')
-                print("-----------------[%d:%d]---------" % (textbegin, textend))
-                print(showtext)
+                if cnt % perLineSecond == 0:
+                    textbegin = int(cnt / perLineSecond) * perLineWord
+                    textend = min((int(cnt / perLineSecond) + 1) * perLineWord, len(texts))
+                    showtext = texts.decode('utf8')[textbegin:textend].encode('utf8')
+                    print("-----------------[%d:%d:%d]---------" % (textbegin, textend, cnt))
+                    print(showtext)
+                #cnt = (cnt + 1) % perLineSecond
+                cnt += 1
+                #print("cnt", cnt)
                 frame_id += 1
-                word_x = frame_width / 3
-                word_y = frame_height - 20
-                #cv2.rectangle(frame, (left_x_up, left_y_up), (right_x_down, right_y_down), (55,255,155), 5)
-                #cv2.putText(frame, '第%s张照片' % frame_id, (word_x, word_y), cv2.FONT_HERSHEY_SIMPLEX, 1, (55,255,155), 1)
+                #word_x = frame_width + 40
+                word_x = 100
+                word_y = frame_height - 40
+                #cv2.rectangle(frame, (word_x, word_y), (frame_width - 40, word_y + 40), (55,255,155), 1)
                 frame = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
                 draw = ImageDraw.Draw(frame)
                 #fontText = ImageFont.truetype("simsun.ttc", 20, encoding="utf-8")
-                fontText = ImageFont.truetype("simsun.ttc", 20)
+                fontText = ImageFont.truetype("simsun.ttc", 35)
+                titleText = ImageFont.truetype("msyh.ttc", 40)
                 #draw.text((word_x, word_y), showtext, (255, 255, 255), font=fontText)
-                draw.text((word_x, word_y), showtext, fill=(0, 0, 0, 0), font=fontText)
+                draw.text((word_x, word_y), showtext.decode('utf8'), fill=(255, 255, 255, 1), font=fontText)
+                draw.text((10, 40), title.decode('utf8'), fill=(255, 255, 255, 1), font=titleText)
+                #(frame, title.decode('utf8')[0:-1].encode('utf8').decode('utf8'), (40, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (55,255,155), 1)
                 frame = cv2.cvtColor(numpy.asarray(frame), cv2.COLOR_RGB2BGR)
+
 
                 #cv2.putText(frame, 'Picture %s' % showtext, (word_x, word_y), cv2.FONT_HERSHEY_SIMPLEX, 1, (55,255,155), 1)
                 videoWriter.write(frame)
@@ -198,6 +207,7 @@ class News2Video():
         audiopath = r'E:\test-res\%s-audio.mp3' % (self.name)
         if os.path.exists(audiopath):
             duration = librosa.get_duration(filename=audiopath)
+            self.audioduration = duration
             print("audiopath:%s with duration:%d is exist, do not need to generate agin." % (audiopath, duration))
             return audiopath, duration
 
@@ -214,6 +224,7 @@ class News2Video():
                 f.write(result)
 
         duration = librosa.get_duration(filename=audiopath)
+        self.audioduration = duration
         return audiopath, duration
 
 def main():
@@ -223,16 +234,17 @@ def test():
     return
 
 if __name__ == "__main__":
-    news2video = News2Video("http://www.cankaoxiaoxi.com/photo/20200306/2403795.shtml")
+    #news2video = News2Video("http://www.cankaoxiaoxi.com/photo/20200306/2403795.shtml")
+    news2video = News2Video("http://www.cankaoxiaoxi.com/photo/20200313/2404484.shtml")
     #news2video.getTextAndPicFromUrl()
-    texts, pics = news2video.getTextAndPicFromUrl()
+    texts, pics, title = news2video.getTextAndPicFromUrl()
     audiopath, duration = news2video.text2Audio(texts)
     print("Audio Generate over, name:%s duration:%d" % (audiopath, duration))
     videopath = news2video.generateVideo(pics, duration)
     print("Video Generate over, name:%s duration:%d" % (videopath, duration))
-    videopath = news2video.addText2Video(videopath, texts)
+    videopath = news2video.addText2Video(videopath, texts, title)
     print("Text Adding over, name:%s duration:%d" % (videopath, duration))
-    #videopath = news2video.addAudio2Video(videopath, audiopath)
+    videopath = news2video.addAudio2Video(videopath, audiopath)
     print("Audio Adding over, name:%s duration:%d" % (videopath, duration))
     #audiopath = news2video.text2Audio('欢迎使用百度语音只能服务')
     #news2video.changePicSize(r'E:\testimg\IMG_1615.JPG', 540, 720)
