@@ -21,6 +21,9 @@ import subprocess
 from aip import AipSpeech
 import librosa
 import numpy
+import urllib2
+import urllib
+import json
 
 class News2Video():
     def __init__(self, url):
@@ -44,16 +47,79 @@ class News2Video():
         print("url:%s name:%s imgroot:%s videoroot:%s" % (self.url, self.name, self.imgroot, self.videoroot))
 
     def getTextAndPicFromUrl(self):
-        text = []
-        pics = []
+        page = urllib2.urlopen(self.url)
+        content = page.read()
+        lines = content.split("\n")
+
+        mapImgContent = []
+        mapContentImg = {}
+        maxLenNote = ""
+        imgs = []
+        title = ""
+        firstnote = ""
+        cnt = 0
+        for line in lines:
+            if line.find("<title>") != -1:
+                titleBegin = line.find("<title>")
+                titleEnd = line.find("</title>")
+                title = line[titleBegin + len("<title>"):titleEnd]
+
+            if line.find("orig") < 0 or line.find("jpeg") > 0:
+                continue
+
+            if cnt >= 9:
+                break
+            #cnt += 1
+            begin = line.find("{")
+            end = line.rfind("}")
+            info = line[begin:(end + 1)].replace(' ', '')
+            orig = info.find("orig:")
+            big = info.find("big:")
+            thumb = info.find("thumb:")
+            note = info.find("note:")
+            url = info.find("url:")
+
+            origUrl = info[orig + len("orig:") + 1:(big - 2)]
+            bigUrl = info[big + len("big:") + 1:(thumb - 2)]
+            thumbUrl = info[thumb + len("thumb:") + 1:(note - 2)]
+            note = info[note + len("note:") + 1:(url - 2)].decode("unicode_escape")
+            #urlUrl = info[orig + len("url:") + 2:(big - 2)]
+
+            if firstnote == "":
+                firstnote = note
+
+            bigUrlNameBegin = bigUrl.rfind("/")
+            bigUrlNameEnd = bigUrl.find(".jpg")
+            bigUrlName = bigUrl[bigUrlNameBegin + 1:bigUrlNameEnd]
+            if os.path.exists(self.imgroot + "/" + bigUrlName + ".jpg"):
+                print("pic:%s is already exsit" % (self.imgroot + "/" + bigUrlName + ".jpg"))
+            else:
+                print("pic:%s is not exsit, let's download it" % (self.imgroot + "/" + bigUrlName + ".jpg"))
+                urllib.urlretrieve(bigUrl, self.imgroot + "/" + bigUrlName + ".jpg")
+            imgcontent = (bigUrlName + ".jpg", note)
+            imgs.append(bigUrlName + ".jpg")
+
+            if len(maxLenNote) <= len(note):
+                maxLenNote = note
+
+            print(imgcontent)
+            mapImgContent.append(imgcontent)
+            if firstnote not in mapContentImg.keys():
+                mapContentImg[firstnote] = [bigUrlName + ".jpg"]
+            else:
+                mapContentImg[firstnote].append(bigUrlName + ".jpg")
+
+        mapContentImg = {}
+        mapContentImg[maxLenNote] = imgs
+
+        #print(mapImgContent)
+        #sys.exit(1)
+
+        #text = []
+        #pics = []
+        #title = u"纽约股市12日早盘暴跌再度触发熔断机制"
+        #text.append(u"3月12日，在美国纽约证券交易所，电子屏显示交易因触发熔断机制暂停。 纽约股市三大股指在12日开盘出现暴跌，跌幅超过7%。暴跌行情导致美股再次触发熔断机制，暂停交易15分钟。 新华社发")
         '''
-        text.append(u"3月5日在韩国大邱世界杯体育场新冠肺炎轻症患者走下救护车之后将被送往分散在庆尚北道各地的治疗中心  当日在韩国大邱一批新冠肺炎轻症患者被集中到世界杯体育场 随后分批从这里出发 被分散送往庆尚北道各地的治疗中心 在治疗中心有专职医疗人员常驻 随时检查设施内确诊人员的身体状况 医疗人员认为需要住院的患者将被迅速移送到医院 新华社发（李相浩 摄）")
-        text.append(u"3月5日在韩国大邱世界杯体育场 医疗队工作人员坐在地上休息 当日，在韩国大邱，一批新冠肺炎轻症患者被集中到世界杯体育场，随后分批从这里出发，被分散送往庆尚北道各地的治疗中心。在治疗中心有专职医疗人员常驻，随时检查设施内确诊人员的身体状况，医疗人员认为需要住院的患者将被迅速移送到医院 新华社发（李相浩 摄）")
-        text.append(u"这是3月5日在韩国庆尚北道漆谷郡拍摄的一处专门供大邱的新冠肺炎轻症患者居住的治疗中心 当日在韩国大邱 一批新冠肺炎轻症患者被集中到世界杯体育场，随后分批从这里出发，被分散送往庆尚北道各地的治疗中心。在治疗中心有专职医疗人员常驻，随时检查设施内确诊人员的身体状况，医疗人员认为需要住院的患者将被迅速移送到医院 新华社发（李相浩 摄）")
-        text.append(u"3月5日在韩国庆尚北道漆谷郡工作人员在一处专门供大邱新冠肺炎轻症患者居住的治疗中心进行消毒防疫 当日在韩国大邱一批新冠肺炎轻症患者被集中到世界杯体育场  随后分批从这里出发  被分散送往庆尚北道各地的治疗中心。在治疗中心有专职医疗人员常驻，随时检查设施内确诊人员的身体状况医疗人员认为需要住院的患者将被迅速移送到医院华社发（李相浩 摄）")
-        '''
-        title = u"纽约股市12日早盘暴跌再度触发熔断机制"
-        text.append(u"3月12日，在美国纽约证券交易所，电子屏显示交易因触发熔断机制暂停。 纽约股市三大股指在12日开盘出现暴跌，跌幅超过7%。暴跌行情导致美股再次触发熔断机制，暂停交易15分钟。 新华社发")
         files = os.listdir(self.imgroot)
         for file in files:
             pics.append(file)
@@ -61,15 +127,22 @@ class News2Video():
         for t in range(1, len(text)):
             texts += text[t]
             print(text[t])
-        print(texts[0:30])
-        return texts, self.imgroot, title
+        #print(texts[0:30])
+        '''
+        #print(mapImgContent)
+        print(self.imgroot)
+        print(title)
+        print(mapContentImg)
+        print(len(mapContentImg))
+        #sys.exit(1)
+        return mapContentImg, title
 
     def changePicSize(self, imgpath, width, height):
         print("imgPath:%s" % imgpath)
         im = Image.open(imgpath)
         w, h = im.size
         print("w:%d width:%d" % (w, width))
-        if w > width:
+        if True or w > width:
             print("pic:%s size is bigger" % (imgpath))
             #hNew = width * h / w
             hNew = height
@@ -98,10 +171,11 @@ class News2Video():
             self.changePicSize(imgpath + "/" + im, minWidth, minHeight)
         return minWidth, minHeight
 
-    def generateVideo(self, imgpath, duration):
+    def generateVideo(self, pics, duration, name):
         #videopath = r"E:\test-res\test.avi"
-        videopath = self.videoroot + "/piconly.avi"
+        videopath = self.videoroot + "/piconly-%s.avi" % name
         #imgpath = r'E:\testimg\/'
+        imgpath = self.imgroot
         minWidth, minHeight = self.changePathPicSize(imgpath)
         imgnum = len(os.listdir(imgpath))
         perSecondImg = max(int(duration / imgnum), 1)
@@ -109,8 +183,9 @@ class News2Video():
         #size = (540, 720)
         fourcc = cv2.VideoWriter_fourcc(*'MJPG')
         videowriter = cv2.VideoWriter(videopath, fourcc, fps, (minWidth, minHeight))
-        for i in os.listdir(imgpath):
-            img = cv2.imread(imgpath + '/' + i)
+        #for i in os.listdir(imgpath):
+        for pic in pics:
+            img = cv2.imread(imgpath + '/' + pic)
             print(img.shape[0], img.shape[1])
             #cv2.rectangle(img, (0, 0), (10, 10), (55,255,155), 5)
             #img = cv2.putText(img, 'frame_%s' % i, (0, 20), cv2.FONT_HERSHEY_SIMPLEX, 1, (55, 255, 155), 2)
@@ -121,7 +196,7 @@ class News2Video():
         print("pers img:%d duration:%d imgnum:%d left:%d" % (perSecondImg, duration, imgnum, left))
         if left > 0:
             for i in range(0, left):
-                img = cv2.imread(imgpath + '/' + os.listdir(imgpath)[-1])
+                img = cv2.imread(imgpath + '/' + pics[-1])
                 videowriter.write(img)
 
         videowriter.release()
@@ -203,8 +278,8 @@ class News2Video():
         print("cmd:%s" % cmd)
         return True
 
-    def text2Audio(self, text):
-        audiopath = r'E:\test-res\%s-audio.mp3' % (self.name)
+    def text2Audio(self, text, name):
+        audiopath = r'E:\test-res\%s-%s.mp3' % (self.name, name)
         if os.path.exists(audiopath):
             duration = librosa.get_duration(filename=audiopath)
             self.audioduration = duration
@@ -235,14 +310,35 @@ def test():
 
 if __name__ == "__main__":
     #news2video = News2Video("http://www.cankaoxiaoxi.com/photo/20200306/2403795.shtml")
-    news2video = News2Video("http://www.cankaoxiaoxi.com/photo/20200313/2404484.shtml")
-    #news2video.getTextAndPicFromUrl()
-    texts, pics, title = news2video.getTextAndPicFromUrl()
+    #news2video = News2Video("http://www.cankaoxiaoxi.com/photo/20200313/2404484.shtml")
+    #news2video = News2Video("http://www.cankaoxiaoxi.com/photo/20200313/2404487.shtml")
+    #news2video = News2Video("http://www.cankaoxiaoxi.com/photo/20200313/2404486.shtml")
+    #news2video = News2Video("http://www.cankaoxiaoxi.com/photo/20200313/2404483.shtml")
+    #news2video = News2Video("http://www.cankaoxiaoxi.com/photo/20200313/2404487.shtml")
+    news2video = News2Video("http://www.cankaoxiaoxi.com/photo/20200313/2404488.shtml")
+    mapContentImg, title = news2video.getTextAndPicFromUrl()
+    print("Get Text and Pic over..")
+    print(mapContentImg)
+    print(title)
+    #for key in mapContentImg:
+    videos = []
+    for i in range(len(mapContentImg.keys())):
+        audiopath, duration = news2video.text2Audio(mapContentImg.keys()[i], "audio-%d" % i)
+        videopath = news2video.generateVideo(mapContentImg.values()[i], duration, "%d" % i)
+        videopath = news2video.addAudio2Video(videopath, audiopath)
+        videos.append(mpe.VideoFileClip(videopath))
+        #print(mapContentImg.keys()[i])
+        #print(mapContentImg.values()[i])
+
+    if len(videos) > 1:
+        finalclip = mpe.concatenate_audioclips(videos)
+        finalclip.to_videofile(news2video.imgroot + "final.mp4", fps=1, remove_temp=False)
+    sys.exit(1)
     audiopath, duration = news2video.text2Audio(texts)
     print("Audio Generate over, name:%s duration:%d" % (audiopath, duration))
     videopath = news2video.generateVideo(pics, duration)
     print("Video Generate over, name:%s duration:%d" % (videopath, duration))
-    videopath = news2video.addText2Video(videopath, texts, title)
+    #videopath = news2video.addText2Video(videopath, texts, title)
     print("Text Adding over, name:%s duration:%d" % (videopath, duration))
     videopath = news2video.addAudio2Video(videopath, audiopath)
     print("Audio Adding over, name:%s duration:%d" % (videopath, duration))
