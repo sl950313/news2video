@@ -10,8 +10,9 @@ step 2: get pic from the same url news
 step 3: generate video by the text and pics
 '''
 import sys
-reload(sys)
-sys.setdefaultencoding('utf8')
+if sys.version[0] == '2':
+    reload(sys)
+    sys.setdefaultencoding('utf8')
 import cv2
 import os
 from PIL import Image, ImageFont, ImageDraw
@@ -21,24 +22,26 @@ import subprocess
 from aip import AipSpeech
 import librosa
 import numpy
-import urllib2
+from urllib.request import urlopen
+# import urllib2
 import urllib
 import json
+import ssl
 
 class News2Video():
     def __init__(self, url):
         self.url = url
         self.name = ""
         if url != "":
-            self.name = self.url.split('/')[-1].split('.')[0]
+            self.name = self.url.split('/')[-2].split('.')[0]
         else:
             print("Please input the right url")
             sys.exit(1)
 
-        #print("name:", self.name, "url", url)
-        #sys.exit(1)
-        self.imgroot = r'E:\testimg\/' + self.name + "/"
-        self.videoroot = r'E:\testavi\/' + self.name + "/"
+        print("name:", self.name, "url", url)
+        # sys.exit(1)
+        self.imgroot = r'C:\news2video\testimg\/' + self.name + "/"
+        self.videoroot = r'C:\news2video\testavi\/' + self.name + "/"
         self.audioduration = 0
         if not os.path.exists(self.imgroot):
             os.makedirs(self.imgroot)
@@ -47,8 +50,12 @@ class News2Video():
         print("url:%s name:%s imgroot:%s videoroot:%s" % (self.url, self.name, self.imgroot, self.videoroot))
 
     def getTextAndPicFromUrl(self):
-        page = urllib2.urlopen(self.url)
+        print("Get Content--- url:", self.url)
+        context = ssl._create_unverified_context()
+
+        page = urlopen(self.url, context=context)
         content = page.read()
+        print(content)
         lines = content.split("\n")
 
         mapImgContent = []
@@ -309,13 +316,7 @@ def test():
     return
 
 if __name__ == "__main__":
-    #news2video = News2Video("http://www.cankaoxiaoxi.com/photo/20200306/2403795.shtml")
-    #news2video = News2Video("http://www.cankaoxiaoxi.com/photo/20200313/2404484.shtml")
-    #news2video = News2Video("http://www.cankaoxiaoxi.com/photo/20200313/2404487.shtml")
-    #news2video = News2Video("http://www.cankaoxiaoxi.com/photo/20200313/2404486.shtml")
-    #news2video = News2Video("http://www.cankaoxiaoxi.com/photo/20200313/2404483.shtml")
-    #news2video = News2Video("http://www.cankaoxiaoxi.com/photo/20200313/2404487.shtml")
-    news2video = News2Video("http://www.cankaoxiaoxi.com/photo/20200313/2404488.shtml")
+    news2video = News2Video("https://www.cankaoxiaoxi.com/#/atlas/details/sylb/5f11f4545e60449db466f7206b42b6e7/2024-07-17%2009:01:48?childrenAlias=undefined")
     mapContentImg, title = news2video.getTextAndPicFromUrl()
     print("Get Text and Pic over..")
     print(mapContentImg)
